@@ -163,9 +163,14 @@ static inline CGFloat radiansToDegrees(CGFloat radians) {
 }
 
 - (instancetype)initWithURL:(NSURL*)url frameUpdater:(FLTFrameUpdater*)frameUpdater {
-  AVPlayerItem* item = [AVPlayerItem playerItemWithURL:url];
-  return [self initWithPlayerItem:item frameUpdater:frameUpdater];
-}
+      NSMutableDictionary * headers = [NSMutableDictionary dictionary];
+      [headers setObject:@"JioDongle" forKey:@"User-Agent"];
+      AVURLAsset * asset = [AVURLAsset URLAssetWithURL:url options:@{@"AVURLAssetHTTPHeaderFieldsKey" : headers}];
+      AVPlayerItem * item = [AVPlayerItem playerItemWithAsset:asset];
+
+  //  AVPlayerItem* item = [AVPlayerItem playerItemWithURL:url];
+    return [self initWithPlayerItem:item frameUpdater:frameUpdater];
+  }
 
 - (CGAffineTransform)fixTransform:(AVAssetTrack*)videoTrack {
   CGAffineTransform transform = videoTrack.preferredTransform;
