@@ -244,65 +244,177 @@ static inline CGFloat radiansToDegrees(CGFloat radians) {
 }
 
 - (void)observeValueForKeyPath:(NSString*)path
+
                       ofObject:(id)object
+
                         change:(NSDictionary*)change
+
                        context:(void*)context {
+
   if (context == timeRangeContext) {
+
     if (_eventSink != nil) {
+
       NSMutableArray<NSArray<NSNumber*>*>* values = [[NSMutableArray alloc] init];
+
       for (NSValue* rangeValue in [object loadedTimeRanges]) {
+
         CMTimeRange range = [rangeValue CMTimeRangeValue];
+
         int64_t start = FLTCMTimeToMillis(range.start);
+
         [values addObject:@[ @(start), @(start + FLTCMTimeToMillis(range.duration)) ]];
+
       }
+
       _eventSink(@{@"event" : @"bufferingUpdate", @"values" : values});
+
     }
+
   } else if (context == statusContext) {
+
     AVPlayerItem* item = (AVPlayerItem*)object;
+
     switch (item.status) {
+
       case AVPlayerItemStatusFailed:
+
         if (_eventSink != nil) {
+
           _eventSink([FlutterError
+
               errorWithCode:@"VideoError"
+
                     message:[@"Failed to load video: "
+
                                 stringByAppendingString:[item.error localizedDescription]]
+
                     details:nil]);
+
         }
+
         break;
+
       case AVPlayerItemStatusUnknown:
+
         break;
+
       case AVPlayerItemStatusReadyToPlay:
+
         [item addOutput:_videoOutput];
+
         [self sendInitialized];
+
         //[self updatePlayingState];
+
         break;
+
     }
+
   } else if (context == playbackLikelyToKeepUpContext) {
+
     if ([[_player currentItem] isPlaybackLikelyToKeepUp]) {
+
       //[self updatePlayingState];
+
       if (_eventSink != nil) {
+
         _eventSink(@{@"event" : @"bufferingEnd"});
+
       }
+
     }
+
   } else if (context == playbackBufferEmptyContext) {
+
     if (_eventSink != nil) {
+
       _eventSink(@{@"event" : @"bufferingStart"});
+
     }
+
   } else if (context == playbackBufferFullContext) {
+
     if (_eventSink != nil) {
+
       _eventSink(@{@"event" : @"bufferingEnd"});
+
     }
+
   }
+
   if (@available(iOS 10.0, *)) {
+
           AVPlayerTimeControlStatus status = _player.timeControlStatus;
+
           if (status == AVPlayerTimeControlStatusPlaying) {
+
               if (_eventSink != nil) {
+
                   _eventSink(@{@"event" : @"bufferingEnd"});
+
               }
+
           }
+
       } else {
+
           // Fallback on earlier versions
+
       }
+
+
+
+    if ([self checkIfScreenCapturing]) {
+
+        if (_eventSink != nil) {
+
+            [_player pause];
+
+            _eventSink([FlutterError
+
+                errorWithCode:@"VideoRecordingError"
+
+                    message: @"VideoRecordingError"
+
+                    details:nil]);
+
+        }
+
+    } else {
+
+        if([_player rate] != 0){
+
+            [_player play];
+
+        }
+
+    }
+
+}
+
+
+
+- (BOOL) checkIfScreenCapturing {
+
+    if (@available(iOS 11.0, *)) {
+
+        BOOL isCaptured = [[UIScreen mainScreen] isCaptured];
+
+        if (isCaptured == true) {
+
+            return true;
+
+        }
+
+    } else {
+
+        // Fallback on earlier versions
+
+    }
+
+    return false;
+
 }
 
 - (void)updatePlayingState {
@@ -368,7 +480,7 @@ static inline CGFloat radiansToDegrees(CGFloat radians) {
       [_player seekToTime:CMTimeMake(location, 1000) toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero completionHandler:^(BOOL finished) {
           NSLog(@"finished: %d", finished);
           dispatch_async(dispatch_get_main_queue(), ^{
-              [self->_player play];
+             // [self->_player play];
           });
       }];
 }
