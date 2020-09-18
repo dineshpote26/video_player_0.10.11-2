@@ -385,12 +385,12 @@ static inline CGFloat radiansToDegrees(CGFloat radians) {
 
     } else {
 
-        if([_player rate] != 0){
-
-            [_player play];
-            _player.rate = _playerRate != 0? _playerRate : 1.0;
-
-        }
+//        if([_player rate] != 0){
+//
+//            [_player play];
+//            _player.rate = _playerRate != 0? _playerRate : 1.0;
+//
+//        }
 
     }
 
