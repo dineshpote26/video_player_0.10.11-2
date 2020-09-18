@@ -439,6 +439,15 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
     await _applyVolume();
   }
 
+  /// Sets the playback speed of [this].
+  ///
+  /// [speed] indicates a value between 0.0 (silent) and 2.0 (full volume) on a
+  /// linear scale.
+  Future<void> setPlaybackSpeed(double volume) async {
+    value = value.copyWith(volume: volume.clamp(0.0, 2.0));
+    await _videoPlayerPlatform.setPlaybackSpeed(_textureId, value.volume);
+  }
+
   /// The closed caption based on the current [position] in the video.
   ///
   /// If there are no closed captions at the current [position], this will

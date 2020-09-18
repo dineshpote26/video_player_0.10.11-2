@@ -46,6 +46,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)dispose:(FLTTextureMessage *)input error:(FlutterError *_Nullable *_Nonnull)error;
 - (void)setLooping:(FLTLoopingMessage *)input error:(FlutterError *_Nullable *_Nonnull)error;
 - (void)setVolume:(FLTVolumeMessage *)input error:(FlutterError *_Nullable *_Nonnull)error;
+- (void)setPlaybackSpeed:(FLTVolumeMessage*)input error:(FlutterError *_Nullable *_Nonnull)error;
 - (void)play:(FLTTextureMessage *)input error:(FlutterError *_Nullable *_Nonnull)error;
 - (nullable FLTPositionMessage *)position:(FLTTextureMessage *)input
                                     error:(FlutterError *_Nullable *_Nonnull)error;

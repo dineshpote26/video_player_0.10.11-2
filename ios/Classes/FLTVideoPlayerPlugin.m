@@ -46,6 +46,8 @@ int64_t FLTCMTimeToMillis(CMTime time) {
 @property(nonatomic, readonly) bool isPlaying;
 @property(nonatomic) bool isLooping;
 @property(nonatomic, readonly) bool isInitialized;
+@property(nonatomic, readonly) float playerRate;
+
 - (instancetype)initWithURL:(NSURL*)url frameUpdater:(FLTFrameUpdater*)frameUpdater;
 - (void)play;
 - (void)pause;
@@ -386,6 +388,7 @@ static inline CGFloat radiansToDegrees(CGFloat radians) {
         if([_player rate] != 0){
 
             [_player play];
+            _player.rate = _playerRate != 0? _playerRate : 1.0;
 
         }
 
@@ -423,6 +426,7 @@ static inline CGFloat radiansToDegrees(CGFloat radians) {
   }
   if (_isPlaying) {
     [_player play];
+    _player.rate = _playerRate != 0? _playerRate : 1.0;
   } else {
     [_player pause];
   }
@@ -491,6 +495,11 @@ static inline CGFloat radiansToDegrees(CGFloat radians) {
 
 - (void)setVolume:(double)volume {
   _player.volume = (float)((volume < 0.0) ? 0.0 : ((volume > 1.0) ? 1.0 : volume));
+}
+
+- (void)setPlaybackSpeed:(double)speed {
+    _playerRate = speed;
+    _player.rate = _playerRate;
 }
 
 - (CVPixelBufferRef)copyPixelBuffer {
@@ -670,6 +679,11 @@ static inline CGFloat radiansToDegrees(CGFloat radians) {
 - (void)setVolume:(FLTVolumeMessage*)input error:(FlutterError**)error {
   FLTVideoPlayer* player = _players[input.textureId];
   [player setVolume:[input.volume doubleValue]];
+}
+
+- (void)setPlaybackSpeed:(FLTVolumeMessage*)input error:(FlutterError**)error {
+  FLTVideoPlayer* player = _players[input.textureId];
+    [player setPlaybackSpeed:[input.volume doubleValue]];
 }
 
 - (void)play:(FLTTextureMessage*)input error:(FlutterError**)error {
